@@ -9,22 +9,36 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Exercise set 3, Task 6-11
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+``` {r}
 
-```{r cars}
-summary(cars)
+library(tidyverse)
+data(mpg, package = "ggplot2")
+mpg %>% tbl_df
+
+mpg %>% select(manufacturer, model, displ, year, cyl, trans, cty, hwy)
+mpg2 <- mpg %>% select(manufacturer, model, displ, year, cyl, trans, cty, hwy)
+
+mpg2 %>% mutate(displ2 = displ^2, vol_per_cyl = displ/cyl)
+
+mpg3 <- mpg2 %>% mutate(displ2 = displ^2, vol_per_cyl = displ/cyl)
+mpg3 %>% arrange(desc(vol_per_cyl))
+
+mpg3 %>% filter(manufacturer == "chevrolet") %>% arrange(desc(vol_per_cyl))
+
+mpg4 <- mpg3 %>% group_by(manufacturer, year) %>% summarise(max_vol_per_cyl = max(vol_per_cyl))
+
+library(tidyr)
+
+mpg5 <- mpg4 %>% spread(year,max_vol_per_cyl)
+
+mpg6 <- mpg5 %>% mutate(change = `2008`-`1999`)
+
+mpg6
+
+mpg6 %>% rename(max_vpc_1999 = `1999`, max_vpc_2008 = `2008`) %>% gather(variable, value, max_vpc_1999, max_vpc_2008, change) %>% View
+
+
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

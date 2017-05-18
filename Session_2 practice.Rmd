@@ -1,0 +1,37 @@
+---
+title: "Session 2a"
+author: "Gijs Custers"
+date: "18 mei 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Test data coding and plots
+
+This Markdown file serves to illustrate some techniques learnt in the second session of the R course
+
+``` {r}
+library(foreign)
+
+data <- read.spss("C:/Git_workspace/session_2/test Wijkprofiel.sav", use.value.labels=FALSE,
+                  to.data.frame=TRUE)
+
+#first select a few variables of interest 
+dataselection <- data %>% select(werkloos_parttime01, werkloos_fulltime01,Geslacht2,leeftijd,subj_gezond, buurtSES1,opleidingsniveau_cent) %>% View
+
+
+# rename variables
+dataselection %>% rename(Parttime = werkloos_parttime01)
+                         
+                         , Fulltime = werkloos_fulltime01)
+                        
+                          ,Male = Geslacht2,Age=leeftijd,Health=subj_gezond,Neighbourhood socioeconomic = buurtSES1,Education_cent=opleidingsniveau_cent)
+
+rename(dataselection,vars)
+
+
+
+```

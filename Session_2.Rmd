@@ -42,3 +42,38 @@ mpg6 %>% rename(max_vpc_1999 = `1999`, max_vpc_2008 = `2008`) %>% gather(variabl
 
 
 ```
+
+
+Exercise set 4 Task 12-14
+
+``` {r}
+
+install.packages("nycflights13")
+library(tidyverse)
+library(nycflights13)
+flights %>% tbl_df
+
+flights2 <- flights %>% select(origin, year, month, day, hour, 
+    sched_dep_time, dep_delay, carrier)
+weather2 <- weather %>% select(origin, year, month, day, hour, 
+    precip, wind_speed, visib)
+
+inner_join(flights2,weather2)
+# Joining, by = c("origin", "year", "month", "day", "hour")
+
+flights2 %>%  full_join(weather2)
+
+weather2 %>% summarise(min_precip = min(precip, na.rm = TRUE), 
+    min_wind = min(wind_speed, na.rm = TRUE), max_visib = max(visib, 
+        na.rm = TRUE))
+
+good_weather_delays <- inner_join(flights2,weather2) %>% filter(precip == min(precip,na.rm = TRUE) & wind_speed == min(wind_speed,na.rm = TRUE) & visib == max(visib,na.rm = TRUE))
+
+good_weather_delays %>% View
+
+good_weather_delays %>% group_by(carrier) %>% summarise(mean(dep_delay)) %>% arrange(mean(dep_delay)) %>% left_join(airlines)
+
+good_weather_delays %>% group_by(carrier) %>% summarise(dep_delay = mean(dep_delay)) %>% arrange(dep_delay) %>% left_join(airlines)
+## why some carriers get NA??
+
+```

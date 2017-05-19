@@ -18,6 +18,7 @@ library(foreign)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
+library(lme4)
 
 # load spss file from local disk
 data <- read.spss("C:/Users/gijs_/Desktop/git_workspace/session_2/test Wijkprofiel.sav", use.value.labels=FALSE,to.data.frame=TRUE)
@@ -42,7 +43,17 @@ dataselection1$neigh_education_2cat <- ifelse(dataselection1$neigh_education>med
 
 ggplot(dataselection1, aes(x = neighbourhoodsocioeco, y= neigh_health, colour = neigh_education_2cat)) + geom_point() + geom_smooth(aes(group=1)) + geom_smooth(se=FALSE) + labs(x= "Neighourhood socioeconomics status", y = "Average neighbourhood health", colour = "Neighbourhood education level", title = "Neighbourhood data for lower and middle educated")
 
+## experimenting with logistic regression, relation between education and probability to work fulltime (as opposed to being umployed)
 
+Model <- glm(fulltime ~ 1 + education, data = dataselection, family = "binomial")
+summary(Model)
 
+summary(dataselection$education)
+prediction <- data.frame(education = seq(-3.687, 3.313, length = 7))
+
+prediction$fulltime <- predict(Model, type = "response", newdata = prediction)
+head(prediction)
+
+ggplot(dataselection, aes(x=education, y=fulltime))+ geom_line(data = prediction)
 
 ```

@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ```
 
 ## Test data coding and plots
@@ -16,25 +16,31 @@ This Markdown file serves to illustrate some techniques learnt in the second ses
 ``` {r}
 library(foreign)
 library(dplyr)
+library(tidyverse)
+library(ggplot2)
 
+# load spss file from local disk
 data <- read.spss("C:/Users/gijs_/Desktop/git_workspace/session_2/test Wijkprofiel.sav", use.value.labels=FALSE,to.data.frame=TRUE)
 
-#first select a few variables of interest 
-dataselection <- data %>% select(werkloos_parttime01, werkloos_fulltime01,Geslacht2,leeftijd,subj_gezond, buurtSES1,opleidingsniveau_cent) %>% tbl_df
+#first select and rename a few variables of interest 
+dataselection <- data %>% select(parttime = werkloos_parttime01, fulltime = werkloos_fulltime01,gender = Geslacht2,age = leeftijd,health = subj_gezond, neighbourhoodsocioeco = buurtSES1,education = opleidingsniveau_cent) %>% tbl_df
 
 
-# rename variables
-rownames(dataselection) <- c("Parttime","Fulltime","Gender","Age", "Health","NeighbourhoodSES","Education") %>% View
+### calculate averages health and education per neighbourhood
+dataselection1 <- dataselection %>% group_by(neighbourhoodsocioeco) %>% summarise(neigh_health = mean(health, na.rm = TRUE), neigh_education = mean(education, na.rm = TRUE), n())
 
-dataselection %>% rename(Parttime = werkloos_parttime01)
-                         
-                         , Fulltime = werkloos_fulltime01)
-                        
-                          ,Male = Geslacht2,Age=leeftijd,Health=subj_gezond,Neighbourhood socioeconomic = buurtSES1,Education_cent=opleidingsniveau_cent)
+### plotting linear relation between education and health, gender grouping?
 
-rename(dataselection,vars)
+# look at distribution neigh_education and split into low-high educated neighbourhoods
 
-?colnames
+ggplot(dataselection1, aes(x=neigh_education)) + geom_histogram()
+
+summary(dataselection1$neigh_education)
+
+dataselection1$neigh_education_2cat <- ifelse(dataselection1$neigh_education>median(dataselection1$neigh_education), c("high"), c("low"))
+
+
+ggplot(dataselection1, aes(x = neighbourhoodsocioeco, y= neigh_health, colour = neigh_education_2cat)) + geom_point() + geom_smooth(aes(group=1)) + geom_smooth(se=FALSE) + labs(x= "Neighourhood socioeconomics status", y = "Average neighbourhood health", colour = "Neighbourhood education level", title = "Neighbourhood data for lower and middle educated")
 
 
 
